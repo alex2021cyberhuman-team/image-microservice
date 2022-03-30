@@ -1,50 +1,66 @@
-﻿using Conduit.Images.Domain.Articles;
+using Conduit.Images.Domain.Articles;
 using Conduit.Shared.Events.Models.Articles.CreateArticle;
 using Conduit.Shared.Events.Models.Articles.DeleteArticle;
 using Conduit.Shared.Events.Models.Articles.UpdateArticle;
-using Microsoft.EntityFrameworkCore;
+using Dapper;
+using Conduit.Images.DataAccess.Extensions;
 
 namespace Conduit.Images.DataAccess.Articles;
 
 public class ArticleConsumerRepository : IArticleConsumerRepository
 {
-    private readonly CommentsContext _context;
+    private readonly ConnectionProvider _connectionProvider;
 
-    public ArticleConsumerRepository(
-        CommentsContext context)
+    public ArticleConsumerRepository(ConnectionProvider connectionProvider)
     {
-        _context = context;
+        _connectionProvider = connectionProvider;
     }
 
-    public async Task CreateAsync(
-        CreateArticleEventModel eventModel)
+    public async Task CreateAsync(CreateArticleEventModel eventModel)
     {
-        var dbModel = new ArticleDbModel
+        var connection = await _connectionProvider.ProvideAsync();
+        const string createArticleQuery = @"INSERT INTO ""article"" (
+            ""id"",
+            ""slug"",
+            ""author_id""
+        ) VALUES (
+            @Id,
+            @Slug,
+            @AuthorId
+        );";
+        await connection.ExecuteAsync(createArticleQuery, new
         {
             Id = eventModel.Id,
             Slug = eventModel.Slug,
             AuthorId = eventModel.AuthorId
-        };
-        _context.Add(dbModel);
-        await _context.SaveChangesAsync();
+        });
     }
 
-    public async Task UpdateAsync(
-        UpdateArticleEventModel eventModel)
+    public async Task RemoveAsync(DeleteArticleEventModel eventModel)
     {
-        var dbModel =
-            await _context.Article.FirstAsync(x => x.Id == eventModel.Id);
-        dbModel.Slug = eventModel.Slug;
-        dbModel.AuthorId = eventModel.AuthorId;
-        await _context.SaveChangesAsync();
+        var connection = await _connectionProvider.ProvideAsync();
+        const string removeArticleQuery = @"DELETE FROM ""article""
+        WHERE ""id"" = @Id;";
+        await connection.ExecuteAsync(removeArticleQuery, new
+        {
+            Id = eventModel.Id
+        }).SingleResult();
     }
 
-    public async Task RemoveAsync(
-        DeleteArticleEventModel eventModel)
+    public async Task UpdateAsync(UpdateArticleEventModel eventModel)
     {
-        var dbModel =
-            await _context.Article.FirstAsync(x => x.Id == eventModel.Id);
-        _context.Article.Remove(dbModel);
-        await _context.SaveChangesAsync();
+        var connection = await _connectionProvider.ProvideAsync();
+        const string updateArticleQuery = @"UPDATE ""article""
+        SET
+            ""slug"" = @Slug,
+            ""author_id"" = @AuthorId
+        WHERE 
+            ""id"" = @Id;";
+        await connection.ExecuteAsync(updateArticleQuery, new
+        {
+            Slug = eventModel.Slug,
+            Id = eventModel.Id,
+            AuthorId = eventModel.AuthorId
+        }).SingleResult();
     }
 }

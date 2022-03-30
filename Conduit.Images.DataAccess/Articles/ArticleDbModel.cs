@@ -1,14 +1,22 @@
-﻿using Conduit.Images.DataAccess.Authors;
+using Dapper.FluentMap.Mapping;
 
 namespace Conduit.Images.DataAccess.Articles;
 
 public class ArticleDbModel
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public string Slug { get; set; } = string.Empty;
+    public string Slug { get; init; } = string.Empty;
 
-    public Guid AuthorId { get; set; }
+    public Guid AuthorId { get; init; }
 
-    public AuthorDbModel Author { get; set; } = null!;
+    public class EntityMap : EntityMap<ArticleDbModel>
+    {
+        public EntityMap()
+        {
+            Map(p => p.Id).ToColumn("id");
+            Map(p => p.Slug).ToColumn("slug");
+            Map(p => p.AuthorId).ToColumn("author_id");
+        }
+    }
 }

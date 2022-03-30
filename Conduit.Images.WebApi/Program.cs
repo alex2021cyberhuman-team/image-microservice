@@ -1,35 +1,14 @@
 using System.Globalization;
 using Conduit.Images.BusinessLogic.Articles;
-using Conduit.Images.BusinessLogic.Authors;
-using Conduit.Images.BusinessLogic.Comments.Create;
-using Conduit.Images.BusinessLogic.Comments.Delete;
-using Conduit.Images.BusinessLogic.Comments.GetMultiple;
-using Conduit.Images.DataAccess;
-using Conduit.Images.DataAccess.Articles;
-using Conduit.Images.DataAccess.Authors;
-using Conduit.Images.DataAccess.Comments;
-using Conduit.Images.Domain.Articles;
-using Conduit.Images.Domain.Authors;
-using Conduit.Images.Domain.Comments.Create;
-using Conduit.Images.Domain.Comments.Delete;
-using Conduit.Images.Domain.Comments.GetMultiple;
-using Conduit.Images.Domain.Comments.Repositories;
 using Conduit.Images.WebApi;
 using Conduit.Shared.Events.Models.Articles.CreateArticle;
 using Conduit.Shared.Events.Models.Articles.DeleteArticle;
 using Conduit.Shared.Events.Models.Articles.UpdateArticle;
-using Conduit.Shared.Events.Models.Comments.CreateComment;
-using Conduit.Shared.Events.Models.Comments.DeleteComment;
-using Conduit.Shared.Events.Models.Profiles.CreateFollowing;
-using Conduit.Shared.Events.Models.Profiles.RemoveFollowing;
-using Conduit.Shared.Events.Models.Users.Register;
-using Conduit.Shared.Events.Models.Users.Update;
 using Conduit.Shared.Events.Services.RabbitMQ;
 using Conduit.Shared.Localization;
 using Conduit.Shared.Startup;
 using Conduit.Shared.Tokens;
 using Conduit.Shared.Validation;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
 
@@ -56,50 +35,17 @@ services.AddSwaggerGen(c =>
 });
 
 services.AddJwtServices(configuration.GetSection("Jwt").Bind)
-    .DisableDefaultModelValidation().AddDbContext<CommentsContext>(
-        optionsBuilder =>
-        {
-            if (environment.IsDevelopment())
-            {
-                optionsBuilder.EnableDetailedErrors()
-                    .EnableSensitiveDataLogging();
-            }
-
-            optionsBuilder.UseSnakeCaseNamingConvention().UseNpgsql(
-                configuration.GetConnectionString("Comments"),
-                contextOptionsBuilder => contextOptionsBuilder
-                    .UseQuerySplittingBehavior(
-                        QuerySplittingBehavior.SplitQuery));
-        }).AddScoped<ICommentCreateHandler, CommentCreateHandler>()
-    .AddScoped<ICommentCreateInputModelValidator,
-        CommentCreateInputModelValidator>()
-    .AddScoped<ICommentDeleteHandler, CommentDeleteHandler>()
-    .AddScoped<ICommentsGetMultipleHandler, CommentsGetMultipleHandler>()
-    .AddScoped<IArticleConsumerRepository, ArticleConsumerRepository>()
-    .AddScoped<IArticleReadRepository, ArticleReadRepository>()
-    .AddScoped<IAuthorConsumerRepository, AuthorConsumerRepository>()
-    .AddScoped<ICommentsReadRepository, CommentReadRepository>()
-    .AddScoped<ICommentsWriteRepository, CommentWriteRepository>()
+    .DisableDefaultModelValidation()
     .AddW3CLogging(configuration.GetSection("W3C").Bind).AddHttpClient()
     .AddHttpContextAccessor()
     .RegisterRabbitMqWithHealthCheck(configuration.GetSection("RabbitMQ").Bind)
-    .AddHealthChecks().AddDbContextCheck<CommentsContext>().Services
-    .RegisterConsumer<RegisterUserEventModel,
-        RegisterUserEventConsumer>(ConfigureConsumer)
-    .RegisterConsumer<UpdateUserEventModel,
-        UpdateUserEventConsumer>(ConfigureConsumer)
+    .AddHealthChecks().Services
     .RegisterConsumer<CreateArticleEventModel,
         CreateArticleEventConsumer>(ConfigureConsumer)
     .RegisterConsumer<UpdateArticleEventModel,
         UpdateArticleEventConsumer>(ConfigureConsumer)
     .RegisterConsumer<DeleteArticleEventModel,
-        DeleteArticleEventConsumer>(ConfigureConsumer)
-    .RegisterConsumer<CreateFollowingEventModel,
-        CreateFollowingEventConsumer>(ConfigureConsumer)
-    .RegisterConsumer<RemoveFollowingEventModel,
-        RemoveFollowingEventConsumer>(ConfigureConsumer)
-    .RegisterProducer<CreateCommentEventModel>()
-    .RegisterProducer<DeleteCommentEventModel>();
+        DeleteArticleEventConsumer>(ConfigureConsumer);
 
 #endregion
 
@@ -127,7 +73,6 @@ app.MapControllers();
 var initializationScope = app.Services.CreateScope();
 
 await initializationScope.WaitHealthyServicesAsync(TimeSpan.FromHours(1));
-await initializationScope.InitializeDatabase();
 await initializationScope.InitializeQueuesAsync();
 
 #endregion
@@ -137,5 +82,5 @@ app.Run();
 void ConfigureConsumer<T>(
     RabbitMqSettings<T> options)
 {
-    options.Consumer = "comments";
+    options.Consumer = "images";
 }

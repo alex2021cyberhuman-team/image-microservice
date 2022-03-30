@@ -2,11 +2,9 @@ using Conduit.Images.Domain.Articles;
 using Conduit.Shared.Events.Models.Articles.CreateArticle;
 using Conduit.Shared.Events.Services;
 using Microsoft.Extensions.Logging;
-
 namespace Conduit.Images.BusinessLogic.Articles;
 
-public class
-    CreateArticleEventConsumer : IEventConsumer<CreateArticleEventModel>
+public class CreateArticleEventConsumer : IEventConsumer<CreateArticleEventModel>
 {
     private readonly IArticleConsumerRepository _articleConsumeRepository;
     private readonly ILogger<CreateArticleEventConsumer> _logger;

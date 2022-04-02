@@ -1,5 +1,3 @@
-using System.Runtime.Serialization;
-
 namespace Conduit.Images.DataAccess.Extensions;
 
 public static class TaskExtensions

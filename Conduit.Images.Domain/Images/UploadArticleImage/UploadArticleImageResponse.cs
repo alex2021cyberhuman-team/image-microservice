@@ -5,10 +5,6 @@ namespace Conduit.Images.Domain.Images.UploadArticleImage;
 
 public class UploadArticleImageResponse : BaseResponse
 {
-    public UploadArticleImageResponse(Error error)
-    {        
-    }
-
     public UploadArticleImageResponse(Model data)
     {
         Data = data;

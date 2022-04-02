@@ -79,7 +79,7 @@ await initializationScope.InitializeQueuesAsync();
 
 app.Run();
 
-void ConfigureConsumer<T>(
+static void ConfigureConsumer<T>(
     RabbitMqSettings<T> options)
 {
     options.Consumer = "images";

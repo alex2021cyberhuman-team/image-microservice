@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Conduit.Images.DataAccess.Extensions;
 using Conduit.Images.DataAccess.Images.Models;
 using Conduit.Images.Domain.Images.Common;
@@ -14,17 +10,14 @@ namespace Conduit.Images.DataAccess.Images.Repositories;
 public class ImageWriteRepository : IImageWriteRepository
 {
     private readonly IImageStorage _imageStorage;
-    private readonly IImageStorageNameGenerator _imageStorageNameGenerator;
     private readonly ConnectionProvider _connectionProvider;
 
-    private readonly IImageUrlProvider _imageUrlProvider;
-
-    public ImageWriteRepository(IImageStorage imageStorage, IImageStorageNameGenerator imageStorageNameGenerator, ConnectionProvider connectionProvider, IImageUrlProvider imageUrlProvider)
+    public ImageWriteRepository(
+        IImageStorage imageStorage,
+        ConnectionProvider connectionProvider)
     {
         _imageStorage = imageStorage;
-        _imageStorageNameGenerator = imageStorageNameGenerator;
         _connectionProvider = connectionProvider;
-        _imageUrlProvider = imageUrlProvider;
     }
 
     public async Task RemoveAsync(ArticleImageDomainModel articleImageDomainModel, CancellationToken cancellationToken = default)
@@ -32,7 +25,7 @@ public class ImageWriteRepository : IImageWriteRepository
         const string removeArticleImageCommand = @"DELETE FROM ""article_image""
         WHERE ""id"" = @Id";
         var connection = await _connectionProvider.ProvideAsync(cancellationToken);
-        await connection.ExecuteAsync(removeArticleImageCommand, new { Id = articleImageDomainModel.Id }).SingleResult();
+        await connection.ExecuteAsync(removeArticleImageCommand, new { articleImageDomainModel.Id }).SingleResult();
         await _imageStorage.RemoveAsync(articleImageDomainModel.StorageName, cancellationToken);
     }
 
@@ -97,8 +90,8 @@ public class ImageReadRepository : IImageReadRepository
             ""uploaded""
         FROM ""article_image""
         WHERE ""id"" = @Id;";
-        var dbModel = await connection.QueryFirstOrDefaultAsync(findArticleImageQuery, new {Id = id});
-        var domainModel = dbModel.ToDomainModel(_imageUrlProvider.Generate(dbModel.StorageName));
+        var dbModel = await connection.QueryFirstOrDefaultAsync(findArticleImageQuery, new { Id = id });
+        var domainModel = dbModel.ToDomainModel(_imageUrlProvider.Provide(dbModel.StorageName));
         return domainModel;
     }
 }

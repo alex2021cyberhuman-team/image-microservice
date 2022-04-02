@@ -1,4 +1,3 @@
-using Conduit.Images.Domain;
 using Conduit.Images.Domain.Images.Services.Streams;
 
 namespace Conduit.Images.Domain.Images.UploadArticleImage;

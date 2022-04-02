@@ -1,9 +1,7 @@
-using Conduit.Images.Domain.Articles;
 using Conduit.Images.Domain.Images.Services.Repositories;
 using Conduit.Images.Domain.Images.UploadArticleImage;
 using Conduit.Shared.Events.Services;
 using Conduit.Shared.Events.Models.Images;
-using Conduit.Images.Domain;
 
 namespace Conduit.Images.BusinessLogic.Images.UploadArticleImage;
 
@@ -33,12 +31,8 @@ public class UploadArticleImageRequestHandler : IUploadArticleImageRequestHandle
         var mediaType = request.ContentType;
         var uploaded = DateTime.UtcNow;
         var imageStorageName = _imageStorageNameGenerator.Generate(userId, imageId, mediaType);
-        if (imageStorageName is null)
-        {
-            return new(Error.BadRequest);
-        }
         var stream = await request.StreamProvider.ProvideStreamAsync();
-        var imageUrl = _imageUrlProvider.Generate(imageStorageName);
+        var imageUrl = _imageUrlProvider.Provide(imageStorageName);
         var domainModel = await _imageWriteRepository.SaveAsync(
             userId,
             stream,
@@ -49,6 +43,16 @@ public class UploadArticleImageRequestHandler : IUploadArticleImageRequestHandle
             uploaded,
             cancellationToken
         );
+        var eventModel = new UploadArticleImageEventModel
+        {
+            Id = domainModel.Id,
+            UserId = domainModel.UserId,
+            Uploaded = domainModel.Uploaded,
+            MediaType = domainModel.MediaType,
+            StorageName = domainModel.StorageName,
+            Url = domainModel.Url
+        };
+        await _eventProducer.ProduceEventAsync(eventModel);
         var uploadArticleImageResponse = new UploadArticleImageResponse(
             new UploadArticleImageResponse.Model(new(null, imageId, imageUrl, mediaType))
         );

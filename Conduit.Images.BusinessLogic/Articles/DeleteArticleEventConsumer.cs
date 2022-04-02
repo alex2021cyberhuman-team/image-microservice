@@ -3,6 +3,9 @@ using Conduit.Shared.Events.Models.Articles.DeleteArticle;
 using Conduit.Shared.Events.Services;
 
 using Microsoft.Extensions.Logging;
+
+namespace Conduit.Images.BusinessLogic.Articles;
+
 public class
     DeleteArticleEventConsumer : IEventConsumer<DeleteArticleEventModel>
 {

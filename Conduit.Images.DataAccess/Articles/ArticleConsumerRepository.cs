@@ -30,9 +30,9 @@ public class ArticleConsumerRepository : IArticleConsumerRepository
         );";
         await connection.ExecuteAsync(createArticleQuery, new
         {
-            Id = eventModel.Id,
-            Slug = eventModel.Slug,
-            AuthorId = eventModel.AuthorId
+            eventModel.Id,
+            eventModel.Slug,
+            eventModel.AuthorId
         });
     }
 
@@ -43,7 +43,7 @@ public class ArticleConsumerRepository : IArticleConsumerRepository
         WHERE ""id"" = @Id;";
         await connection.ExecuteAsync(removeArticleQuery, new
         {
-            Id = eventModel.Id
+            eventModel.Id
         }).SingleResult();
     }
 
@@ -58,9 +58,9 @@ public class ArticleConsumerRepository : IArticleConsumerRepository
             ""id"" = @Id;";
         await connection.ExecuteAsync(updateArticleQuery, new
         {
-            Slug = eventModel.Slug,
-            Id = eventModel.Id,
-            AuthorId = eventModel.AuthorId
+            eventModel.Slug,
+            eventModel.Id,
+            eventModel.AuthorId
         }).SingleResult();
     }
 }

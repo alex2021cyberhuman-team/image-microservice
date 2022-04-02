@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Conduit.Images.Domain.Images.Common;
 
 namespace Conduit.Images.DataAccess.Images.Models;
@@ -36,7 +32,7 @@ public class ArticleImageDbModel
 
     public Guid? ArticleId { get; }
 
-    public ArticleImageDomainModel ToDomainModel(string url = "") => new ArticleImageDomainModel(
+    public ArticleImageDomainModel ToDomainModel(string url = "") => new(
             Id,
             UserId,
             url,

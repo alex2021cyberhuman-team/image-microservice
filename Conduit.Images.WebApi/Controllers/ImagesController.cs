@@ -1,6 +1,7 @@
 using System.Net;
+using Conduit.Images.Domain.Configuration;
+using Conduit.Images.Domain.Images.RemoveArticleImage;
 using Conduit.Images.Domain.Images.UploadArticleImage;
-using Conduit.Images.WebApi.Configuration;
 using Conduit.Images.WebApi.Services;
 using Conduit.Shared.AuthorizationExtensions;
 using Conduit.Shared.ResponsesExtensions;
@@ -18,6 +19,7 @@ public class ImagesController : ControllerBase
     private readonly IStringLocalizer _stringLocalizer;
     private readonly ImageConfiguration _imageConfiguration;
     private readonly ILogger _logger;
+
     public ImagesController(
         IStringLocalizer stringLocalizer,
         IOptions<ImageConfiguration> imageConfigration,
@@ -29,6 +31,8 @@ public class ImagesController : ControllerBase
     }
 
     [Authorize]
+    [HttpPost]
+    [Produces(typeof(UploadArticleImageResponse.Model))]
     public async Task<IActionResult> Upload(
         [FromServices] IUploadArticleImageRequestHandler uploadArticleImageRequestHandler,
         CancellationToken cancellationToken)
@@ -53,16 +57,40 @@ public class ImagesController : ControllerBase
         return actionResult;
     }
 
+    [Authorize]
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<IActionResult> Remove(Guid id,
+        [FromServices] IRemoveArticleImageHandler removeArticleImageHandler,
+        CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetCurrentUserId();
+        var removeArticleImageRequest = new RemoveArticleImageRequest(userId, id);
+        var removeArticleImageResponse = await removeArticleImageHandler.RemoveAsync(removeArticleImageRequest, cancellationToken);
+        var actionResult = removeArticleImageResponse.Error.GetAndLogActionResult(
+            null,
+            null,
+            _logger);
+        return actionResult;
+    }
+
     private bool CheckContentType()
     {
-        return HttpContext.Request.ContentType?.StartsWith("image/") ?? false;
+        var contentType = HttpContext.Request.ContentType ?? string.Empty;
+        var mediaTypeMapping = _imageConfiguration.MediaTypeMapping;
+        var validMediaType = mediaTypeMapping.ContainsKey(contentType);
+        return validMediaType;
     }
 
     private bool CheckContentLength()
     {
-        return HttpContext.Request.ContentLength != 0 && (
-                    _imageConfiguration.MaxImageSize == long.MaxValue ||
-                    HttpContext.Request.ContentLength <= _imageConfiguration.MaxImageSize);
+        var contentLength = HttpContext.Request.ContentLength;
+        var notEqualZero = contentLength != 0;
+        var lowerThanMaxImageSize = _imageConfiguration.MaxImageSize == long.MaxValue || HttpContext.Request.ContentLength <= _imageConfiguration.MaxImageSize;
+        var validContentLength = notEqualZero && lowerThanMaxImageSize;
+        return validContentLength;
     }
 
     private IActionResult InvalidContentLength => new ObjectResult(new

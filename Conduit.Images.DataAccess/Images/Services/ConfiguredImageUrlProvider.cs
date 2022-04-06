@@ -5,18 +5,18 @@ namespace Conduit.Images.DataAccess.Images.Services;
 
 public class ConfiguredImageUrlProvider : IImageUrlProvider
 {
-    public IOptionsMonitor<Options> _optionsMonitor;
+    private readonly IOptionsMonitor<Options> _optionsMonitor;
 
     public ConfiguredImageUrlProvider(IOptionsMonitor<Options> optionsMonitor)
     {
         _optionsMonitor = optionsMonitor;
     }
 
-    public Options Current => _optionsMonitor.CurrentValue;
+    private Options OptionsInstance => _optionsMonitor.CurrentValue;
 
     public string Provide(string storageName)
     {
-        var enpointToRetriveFormat = Current.EnpointToRetriveFormat;
+        var enpointToRetriveFormat = OptionsInstance.EnpointToRetriveFormat;
         var url = string.Format(enpointToRetriveFormat, storageName);
         return url;
     }

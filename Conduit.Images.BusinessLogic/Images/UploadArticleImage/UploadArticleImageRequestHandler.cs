@@ -1,7 +1,5 @@
 using Conduit.Images.Domain.Images.Services.Repositories;
 using Conduit.Images.Domain.Images.UploadArticleImage;
-using Conduit.Shared.Events.Services;
-using Conduit.Shared.Events.Models.Images;
 
 namespace Conduit.Images.BusinessLogic.Images.UploadArticleImage;
 
@@ -10,18 +8,15 @@ public class UploadArticleImageRequestHandler : IUploadArticleImageRequestHandle
     private readonly IImageWriteRepository _imageWriteRepository;
     private readonly IImageStorageNameGenerator _imageStorageNameGenerator;
     private readonly IImageUrlProvider _imageUrlProvider;
-    private readonly IEventProducer<UploadArticleImageEventModel> _eventProducer;
 
     public UploadArticleImageRequestHandler(
         IImageWriteRepository imageWriteRepository,
         IImageStorageNameGenerator imageStorageNameGenerator,
-        IImageUrlProvider imageUrlProvider,
-        IEventProducer<UploadArticleImageEventModel> eventProducer)
+        IImageUrlProvider imageUrlProvider)
     {
         _imageWriteRepository = imageWriteRepository;
         _imageStorageNameGenerator = imageStorageNameGenerator;
         _imageUrlProvider = imageUrlProvider;
-        _eventProducer = eventProducer;
     }
 
     public async Task<UploadArticleImageResponse> UploadAsync(UploadArticleImageRequest request, CancellationToken cancellationToken = default)
@@ -41,21 +36,14 @@ public class UploadArticleImageRequestHandler : IUploadArticleImageRequestHandle
             imageStorageName,
             imageUrl,
             uploaded,
-            cancellationToken
-        );
-        var eventModel = new UploadArticleImageEventModel
-        {
-            Id = domainModel.Id,
-            UserId = domainModel.UserId,
-            Uploaded = domainModel.Uploaded,
-            MediaType = domainModel.MediaType,
-            StorageName = domainModel.StorageName,
-            Url = domainModel.Url
-        };
-        await _eventProducer.ProduceEventAsync(eventModel);
+            cancellationToken);
+
         var uploadArticleImageResponse = new UploadArticleImageResponse(
-            new UploadArticleImageResponse.Model(new(null, imageId, imageUrl, mediaType))
-        );
+            new UploadArticleImageResponse.Model(new(
+                domainModel.ArticleId,
+                domainModel.Id,
+                domainModel.Url,
+                domainModel.MediaType)));
         return uploadArticleImageResponse;
     }
 }

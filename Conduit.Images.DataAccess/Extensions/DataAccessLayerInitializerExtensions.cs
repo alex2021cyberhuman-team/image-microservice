@@ -15,6 +15,5 @@ public static class DataAccessLayerRegistrationExtensions
 {
     public static void RegisterDataAccessLayer(this IServiceCollection services)
     {
-        services.AddScoped<
     }
 }

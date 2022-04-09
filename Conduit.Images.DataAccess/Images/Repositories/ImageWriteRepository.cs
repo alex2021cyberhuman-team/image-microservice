@@ -1,5 +1,6 @@
 using Conduit.Images.DataAccess.Extensions;
 using Conduit.Images.DataAccess.Images.Models;
+using Conduit.Images.Domain.Articles;
 using Conduit.Images.Domain.Images.Common;
 using Conduit.Images.Domain.Images.Services.Repositories;
 using Dapper;
@@ -17,6 +18,15 @@ public class ImageWriteRepository : IImageWriteRepository
     {
         _imageStorage = imageStorage;
         _connectionProvider = connectionProvider;
+    }
+
+    public async Task AssignAsync(ArticleDomainModel article, ISet<Guid> imageIds, CancellationToken cancellationToken = default)
+    {
+        const string assignArticleImageCommand = @"UPDATE ""article_image""
+        SET ""article_id"" = @ArticleId
+        WHERE ""id"" IN @ImageIds";
+        var connection = await _connectionProvider.ProvideAsync(cancellationToken);
+        await connection.ExecuteAsync(assignArticleImageCommand, new { ImageIds = imageIds, ArticleId = article.Id });
     }
 
     public async Task RemoveAsync(ArticleImageDomainModel articleImageDomainModel, CancellationToken cancellationToken = default)
@@ -64,8 +74,7 @@ public class ImageWriteRepository : IImageWriteRepository
             @UserId,
             @StorageName,
             @MediaType,
-            @Uploaded,
-            @ArticleId
+            @Uploaded
         );";
         await connection.ExecuteAsync(insertArticleImageCommand, dbModel).SingleResult();
         return dbModel;

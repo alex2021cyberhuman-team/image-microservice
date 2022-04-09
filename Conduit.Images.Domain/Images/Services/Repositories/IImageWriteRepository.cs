@@ -1,3 +1,4 @@
+using Conduit.Images.Domain.Articles;
 using Conduit.Images.Domain.Images.Common;
 
 namespace Conduit.Images.Domain.Images.Services.Repositories;
@@ -23,5 +24,5 @@ public interface IImageWriteRepository
     /// <returns><code>True</code> if image found and removed, otherwise <code>False</code></returns>
     public Task RemoveAsync(ArticleImageDomainModel articleImageDomainModel, CancellationToken cancellationToken = default);
 
-    public Task AssignAsync
+    public Task AssignAsync(ArticleDomainModel article, ISet<Guid> imageIds, CancellationToken cancellationToken = default);
 }

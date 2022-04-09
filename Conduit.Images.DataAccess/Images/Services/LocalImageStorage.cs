@@ -14,7 +14,19 @@ public class LocalImageStorage : IImageStorage
 
     public Options OptionsInstance => _optionsMonitor.CurrentValue;
 
-    public Task RemoveAsync(string storageName, CancellationToken cancellationToken)
+    public Task RemoveAsync(string storageName, CancellationToken cancellationToken = default)
+    {
+        RemoveSync(storageName);
+        return Task.CompletedTask;
+    }
+
+    public Task MultipleRemoveAsync(IReadOnlyCollection<string> storageNames, CancellationToken cancellationToken = default)
+    {
+        storageNames.AsParallel().ForAll(RemoveSync);
+        return Task.CompletedTask;
+    }
+
+    private void RemoveSync(string storageName)
     {
         var localDirectory = OptionsInstance.LocalDirectory;
         var fullFileName = Path.Combine(localDirectory, storageName);
@@ -22,12 +34,10 @@ public class LocalImageStorage : IImageStorage
         if (isExists)
         {
             File.Delete(fullFileName);
-            return Task.CompletedTask;
         }
-        return Task.CompletedTask;
     }
 
-    public Task<Stream?> RetrieveAsync(string storageName, CancellationToken cancellationToken)
+    public Task<Stream?> RetrieveAsync(string storageName, CancellationToken cancellationToken = default)
     {
         var localDirectory = OptionsInstance.LocalDirectory;
         var fullFileName = Path.Combine(localDirectory, storageName);
@@ -39,7 +49,7 @@ public class LocalImageStorage : IImageStorage
         return Task.FromResult((Stream?)null);
     }
 
-    public async Task StoreAsync(string storageName, Stream stream, CancellationToken cancellationToken)
+    public async Task StoreAsync(string storageName, Stream stream, CancellationToken cancellationToken = default)
     {
         var localDirectory = OptionsInstance.LocalDirectory;
         var fullFileName = Path.Combine(localDirectory, storageName);

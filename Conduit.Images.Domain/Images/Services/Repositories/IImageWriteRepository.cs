@@ -22,4 +22,6 @@ public interface IImageWriteRepository
     /// <param name="cancellationToken"></param>
     /// <returns><code>True</code> if image found and removed, otherwise <code>False</code></returns>
     public Task RemoveAsync(ArticleImageDomainModel articleImageDomainModel, CancellationToken cancellationToken = default);
+
+    public Task AssignAsync
 }

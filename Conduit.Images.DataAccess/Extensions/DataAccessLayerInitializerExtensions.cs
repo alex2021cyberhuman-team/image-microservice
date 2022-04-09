@@ -11,9 +11,3 @@ public static class DataAccessLayerInitializerExtensions
         await initializer.InitializeAsync();
     }
 }
-public static class DataAccessLayerRegistrationExtensions
-{
-    public static void RegisterDataAccessLayer(this IServiceCollection services)
-    {
-    }
-}

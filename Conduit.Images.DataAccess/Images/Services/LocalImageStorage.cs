@@ -12,11 +12,11 @@ public class LocalImageStorage : IImageStorage
         _optionsMonitor = optionsMonitor;
     }
 
-    public Options Current => _optionsMonitor.CurrentValue;
+    public Options OptionsInstance => _optionsMonitor.CurrentValue;
 
     public Task RemoveAsync(string storageName, CancellationToken cancellationToken)
     {
-        var localDirectory = Current.LocalDirectory;
+        var localDirectory = OptionsInstance.LocalDirectory;
         var fullFileName = Path.Combine(localDirectory, storageName);
         var isExists = File.Exists(fullFileName);
         if (isExists)
@@ -29,7 +29,7 @@ public class LocalImageStorage : IImageStorage
 
     public Task<Stream?> RetrieveAsync(string storageName, CancellationToken cancellationToken)
     {
-        var localDirectory = Current.LocalDirectory;
+        var localDirectory = OptionsInstance.LocalDirectory;
         var fullFileName = Path.Combine(localDirectory, storageName);
         var isExists = File.Exists(fullFileName);
         if (isExists)
@@ -41,7 +41,7 @@ public class LocalImageStorage : IImageStorage
 
     public async Task StoreAsync(string storageName, Stream stream, CancellationToken cancellationToken)
     {
-        var localDirectory = Current.LocalDirectory;
+        var localDirectory = OptionsInstance.LocalDirectory;
         var fullFileName = Path.Combine(localDirectory, storageName);
         if (stream.CanSeek)
         {

@@ -13,7 +13,6 @@ public class RemoveArticleImageHandler : IRemoveArticleImageHandler
     private readonly IImageWriteRepository _imageWriteRepository;
 
     private readonly IImageReadRepository _imageReadRepository;
-
     public RemoveArticleImageHandler(
         IImageReadRepository imageReadRepository,
         IImageWriteRepository imageWriteRepository)

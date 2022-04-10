@@ -4,5 +4,7 @@ namespace Conduit.Images.Domain.Images.Services.Repositories;
 
 public interface IImageReadRepository
 {
-    public Task<ArticleImageDomainModel?> FindAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<ArticleImageDomainModel?> FindAsync(Guid id, CancellationToken cancellationToken = default);
+    
+    Task<IReadOnlyCollection<ArticleImageDomainModel>> FindByIdsAsync(HashSet<Guid> imageIds, CancellationToken cancellationToken);
 }

@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using Conduit.Images.DataAccess.Extensions;
 using Conduit.Images.DataAccess.Images.Models;
 using Conduit.Images.Domain.Articles;
@@ -36,6 +37,18 @@ public class ImageWriteRepository : IImageWriteRepository
         var connection = await _connectionProvider.ProvideAsync(cancellationToken);
         await connection.ExecuteAsync(removeArticleImageCommand, new { articleImageDomainModel.Id }).SingleResult();
         await _imageStorage.RemoveAsync(articleImageDomainModel.StorageName, cancellationToken);
+    }
+
+    public async Task RemoveUnassignedOlderThanAsync(DateTime dateTime, CancellationToken cancellationToken = default)
+    {
+        var connection = await _connectionProvider.ProvideAsync(cancellationToken);
+        const string getArticleImageStorageNamesOlderThenDateTimeQuery = @"SELECT ""storage_name"" FROM ""article_image"" 
+        WHERE  ""uploaded"" < @DateTime AND ""article_id"" IS NULL";
+        var names = await connection.QueryAsync<string>(getArticleImageStorageNamesOlderThenDateTimeQuery);
+        await _imageStorage.MultipleRemoveAsync(names.ToList(), cancellationToken);
+        const string removeArticleImageOlderThanDateTimeCommand = @"DELETE FROM ""article_image""
+        WHERE ""uploaded"" < @DateTime AND ""article_id"" IS NULL";
+        await connection.ExecuteAsync(removeArticleImageOlderThanDateTimeCommand, new { DateTime = dateTime });
     }
 
     public async Task<ArticleImageDomainModel> SaveAsync(

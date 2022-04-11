@@ -15,13 +15,8 @@ public interface IImageWriteRepository
         DateTime uploaded,
         CancellationToken cancellationToken = default);
 
-    /// <summary>
-    ///     Removes image from database and its file
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="id"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns><code>True</code> if image found and removed, otherwise <code>False</code></returns>
+    public Task RemoveUnassignedOlderThanAsync(DateTime dateTime, CancellationToken cancellationToken = default);
+
     public Task RemoveAsync(ArticleImageDomainModel articleImageDomainModel, CancellationToken cancellationToken = default);
 
     public Task AssignAsync(ArticleDomainModel article, ISet<Guid> imageIds, CancellationToken cancellationToken = default);

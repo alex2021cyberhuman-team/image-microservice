@@ -26,4 +26,6 @@ public class ImageConfiguration
         ["image/x-icon"] = ".ico",
         ["image/tiff"] = ".tif"
     };
+
+    public TimeSpan UnassignedImagesRemovingTime { get; set; } = TimeSpan.FromMinutes(1);
 }

@@ -44,13 +44,18 @@ public class ArticleConsumerRepository : IArticleConsumerRepository
 
     public async Task RemoveAsync(DeleteArticleEventModel eventModel)
     {
+        await RemoveByArticleImagesByIdArticleAsync(eventModel.Id);
+        await RemoveArticleAsync(eventModel.Id);
+    }
+
+    private async Task RemoveArticleAsync(Guid id)
+    {
         var connection = await _connectionProvider.ProvideAsync();
         const string removeArticleQuery = @"DELETE FROM ""article""
         WHERE ""id"" = @Id;";
-        await RemoveByArticleIdAsync(eventModel.Id);
         await connection.ExecuteAsync(removeArticleQuery, new
         {
-            eventModel.Id
+            id
         }).SingleResult();
     }
 
@@ -71,7 +76,7 @@ public class ArticleConsumerRepository : IArticleConsumerRepository
         }).SingleResult();
     }
 
-    public async Task RemoveByArticleIdAsync(Guid articleId)
+    public async Task RemoveByArticleImagesByIdArticleAsync(Guid articleId)
     {
         var connection = await _connectionProvider.ProvideAsync();
 

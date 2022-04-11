@@ -1,4 +1,5 @@
 using Conduit.Images.Domain.Images.Common;
+using Dapper.FluentMap.Mapping;
 
 namespace Conduit.Images.DataAccess.Images.Models;
 
@@ -20,6 +21,7 @@ public class ArticleImageDbModel
         Uploaded = uploaded;
         ArticleId = articleId;
     }
+
     public Guid Id { get; }
 
     public Guid UserId { get; }
@@ -41,4 +43,17 @@ public class ArticleImageDbModel
             Uploaded,
             ArticleId
         );
+
+    public class EntityMap : EntityMap<ArticleImageDbModel>
+    {
+        public EntityMap()
+        {
+            Map(i => i.Id).ToColumn("id");
+            Map(i => i.UserId).ToColumn("user_id");
+            Map(i => i.StorageName).ToColumn("storage_name");
+            Map(i => i.MediaType).ToColumn("media_type");
+            Map(i => i.Uploaded).ToColumn("uploaded");
+            Map(i => i.ArticleId).ToColumn("article_id");
+        }
+    }
 }

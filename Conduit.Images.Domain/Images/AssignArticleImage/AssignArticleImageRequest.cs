@@ -7,7 +7,7 @@ public class AssignArticleImageRequest
         UserId = userId;
         ArticleId = articleId;
         Body = body;
-    }    
+    }
 
     public Guid UserId { get; set; }
 

@@ -92,7 +92,7 @@ public class ArticleConsumerRepository : IArticleConsumerRepository
     {
         const string getArticleImageStorageNamesQuery = @"SELECT ""storage_name"" 
         FROM ""article_image"" WHERE ""article_id"" = @ArticleId";
-        var articleImageStorageNames = 
+        var articleImageStorageNames =
             await connection.QueryAsync<string>(getArticleImageStorageNamesQuery, new { ArticleId = articleId });
         return articleImageStorageNames;
     }

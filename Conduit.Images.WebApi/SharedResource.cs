@@ -1,4 +1,4 @@
-﻿namespace Conduit.Images.WebApi;
+namespace Conduit.Images.WebApi;
 
 public class SharedResource
 {

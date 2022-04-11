@@ -5,7 +5,7 @@ namespace Conduit.Images.Domain.Images.UploadArticleImage;
 public class UploadArticleImageRequest
 {
     public UploadArticleImageRequest(
-        IRequestStreamProvider streamProvider, 
+        IRequestStreamProvider streamProvider,
         string contentType,
         Guid userId)
     {

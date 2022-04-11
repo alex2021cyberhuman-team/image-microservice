@@ -17,7 +17,7 @@ public class AssignArticleImageHandler : IAssignArticleImageHandler
     private readonly IImageWriteRepository _imageWriteRepository;
 
     private readonly IArticleReadRepository _articleReadRepository;
-    
+
     private readonly ILogger _logger;
 
     public AssignArticleImageHandler(

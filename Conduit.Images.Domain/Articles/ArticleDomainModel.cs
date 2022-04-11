@@ -1,4 +1,4 @@
-﻿namespace Conduit.Images.Domain.Articles;
+namespace Conduit.Images.Domain.Articles;
 
 public class ArticleDomainModel
 {

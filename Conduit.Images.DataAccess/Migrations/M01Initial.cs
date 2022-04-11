@@ -20,7 +20,8 @@ public class M01Initial : Migration
             .WithColumn("storage_name").AsString(1000)
             .WithColumn("media_type").AsString(50)
             .WithColumn("uploaded").AsDateTime2().Indexed()
-            .WithColumn("article_id").
+            .WithColumn("article_id").AsGuid()
+                .ForeignKey("article", "id");
     }
 
     public override void Down()

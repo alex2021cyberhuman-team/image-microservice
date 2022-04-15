@@ -15,7 +15,7 @@ public class ConfiguredImageStorageNameGenerator : IImageStorageNameGenerator
         IOptionsMonitor<ImageConfiguration> imageConfigurationsMonitor)
     {
         _optionsMonitor = optionsMonitor;
-        this._imageConfigurationsMonitor = imageConfigurationsMonitor;
+        _imageConfigurationsMonitor = imageConfigurationsMonitor;
     }
 
     private Options OptionsInstance => _optionsMonitor.CurrentValue;

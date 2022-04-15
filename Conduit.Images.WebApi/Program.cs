@@ -1,5 +1,8 @@
 using System.Globalization;
 using Conduit.Images.BusinessLogic.Articles;
+using Conduit.Images.BusinessLogic.Extensions;
+using Conduit.Images.DataAccess.Extensions;
+using Conduit.Images.Domain.Configuration;
 using Conduit.Images.WebApi;
 using Conduit.Shared.Events.Models.Articles.CreateArticle;
 using Conduit.Shared.Events.Models.Articles.DeleteArticle;
@@ -38,6 +41,7 @@ services.AddJwtServices(configuration.GetSection("Jwt").Bind)
     .DisableDefaultModelValidation()
     .AddW3CLogging(configuration.GetSection("W3C").Bind).AddHttpClient()
     .AddHttpContextAccessor()
+    .Configure<ImageConfiguration>(builder.Configuration.GetSection("ImageConfiguration").Bind)
     .RegisterRabbitMqWithHealthCheck(configuration.GetSection("RabbitMQ").Bind)
     .AddHealthChecks().Services
     .RegisterConsumer<CreateArticleEventModel,
@@ -46,6 +50,10 @@ services.AddJwtServices(configuration.GetSection("Jwt").Bind)
         UpdateArticleEventConsumer>(ConfigureConsumer)
     .RegisterConsumer<DeleteArticleEventModel,
         DeleteArticleEventConsumer>(ConfigureConsumer);
+
+var migrationsIsOn =  builder.Configuration.GetSection("Migrations").Get<bool>();
+services.RegisterDataAccessLayer(builder.Configuration, migrationsIsOn);
+services.RegisterBusinessLogicLayer();
 
 #endregion
 
@@ -73,6 +81,7 @@ app.MapControllers();
 var initializationScope = app.Services.CreateScope();
 
 await initializationScope.WaitHealthyServicesAsync(TimeSpan.FromHours(1));
+await initializationScope.InitializeDataAccessLayerAsync(migrationsIsOn);
 await initializationScope.InitializeQueuesAsync();
 
 #endregion

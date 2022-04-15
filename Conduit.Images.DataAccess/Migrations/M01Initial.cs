@@ -14,6 +14,7 @@ public class M01Initial : Migration
             .WithColumn("id").AsGuid().PrimaryKey()
             .WithColumn("slug").AsString(1000)
             .WithColumn("author_id").AsGuid();
+            
         Create.Table("article_image")
             .WithColumn("id").AsGuid().PrimaryKey()
             .WithColumn("user_id").AsGuid()

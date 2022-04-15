@@ -1,19 +1,23 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Conduit.Images.DataAccess;
 
 public class ConnectionProvider : IAsyncDisposable, IDisposable
 {
     private readonly Npgsql.NpgsqlConnection _connection;
+    
     private readonly ILogger<ConnectionProvider> _logger;
 
+    private readonly Options _options;
+
     public ConnectionProvider(
-        IConfiguration configuration,
-        ILogger<ConnectionProvider> logger)
+        ILogger<ConnectionProvider> logger,
+        IOptions<Options> options)
     {
-        var connectionString = configuration.GetConnectionString("ImageDatabase");
-        _connection = new Npgsql.NpgsqlConnection(connectionString);
+        _options = options.Value;
+        _connection = new Npgsql.NpgsqlConnection(_options.ImageDatabase);
         _logger = logger;
     }
 
@@ -45,5 +49,10 @@ public class ConnectionProvider : IAsyncDisposable, IDisposable
             _logger.LogInformation("Openning");
             await _connection.OpenAsync(cancellationToken);
         }
+    }
+
+    public class Options
+    {
+        public string ImageDatabase { get; set; } = string.Empty;
     }
 }

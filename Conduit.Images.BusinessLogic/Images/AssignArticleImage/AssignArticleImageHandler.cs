@@ -57,6 +57,11 @@ public class AssignArticleImageHandler : IAssignArticleImageHandler
             images,
             imageIds);
 
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
         var assignableImageIds = images
             .Where(x => x.ArticleId != articleId)
             .Select(x => x.Id).ToHashSet();

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Conduit.Images.BusinessLogic.Images.AssignArticleImage;
 using Conduit.Images.BusinessLogic.Images.RemoveArticleImage;
 using Conduit.Images.BusinessLogic.Images.RemoveUnassignedImages;

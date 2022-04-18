@@ -1,5 +1,6 @@
 using System.Net;
 using Conduit.Images.Domain.Configuration;
+using Conduit.Images.Domain.Images.AssignArticleImage;
 using Conduit.Images.Domain.Images.RemoveArticleImage;
 using Conduit.Images.Domain.Images.UploadArticleImage;
 using Conduit.Images.WebApi.Services;
@@ -32,7 +33,9 @@ public class ImagesController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    [Produces(typeof(UploadArticleImageResponse.Model))]
+    [ProducesResponseType(typeof(UploadArticleImageResponse.Model), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
     public async Task<IActionResult> Upload(
         [FromServices] IUploadArticleImageRequestHandler uploadArticleImageRequestHandler,
         CancellationToken cancellationToken)
@@ -60,6 +63,7 @@ public class ImagesController : ControllerBase
     [Authorize]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.Forbidden)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public async Task<IActionResult> Remove(Guid id,
@@ -73,6 +77,27 @@ public class ImagesController : ControllerBase
             null,
             null,
             _logger);
+        return actionResult;
+    }
+
+    [Authorize]
+    [HttpPost("{imageId:guid}/assign/{articleId:guid}")]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<IActionResult> Assign(Guid imageId,
+            Guid articleId,
+            [FromServices] IAssignArticleImageHandler assignArticleImageHandler,
+            CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetCurrentUserId();
+        // var removeArticleImageRequest = new RemoveArticleImageRequest(userId, id);
+        // var removeArticleImageResponse = await removeArticleImageHandler.RemoveAsync(removeArticleImageRequest, cancellationToken);
+        // var actionResult = removeArticleImageResponse.Error.GetAndLogActionResult(
+        //     null,
+        //     null,
+        //     _logger);
         return actionResult;
     }
 

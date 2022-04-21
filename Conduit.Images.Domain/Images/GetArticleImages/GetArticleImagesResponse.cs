@@ -1,3 +1,4 @@
+using Conduit.Images.Domain.Images.Common;
 using Conduit.Shared.ResponsesExtensions;
 
 namespace Conduit.Images.Domain.Images.GetArticleImages;

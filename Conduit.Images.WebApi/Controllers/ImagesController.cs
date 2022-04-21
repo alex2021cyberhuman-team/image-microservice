@@ -107,7 +107,10 @@ public class ImagesController : ControllerBase
     [HttpGet]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
-    public async Task<IActionResult> GetArticleImages(Guid articleId)
+    public Task<IActionResult> GetArticleImages(Guid articleId)
+    {
+        throw new NotImplementedException();
+    }
 
     [HttpGet("{storageName}")]
     [ProducesResponseType((int)HttpStatusCode.OK)]

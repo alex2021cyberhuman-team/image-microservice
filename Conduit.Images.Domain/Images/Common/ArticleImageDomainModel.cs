@@ -1,3 +1,5 @@
+namespace Conduit.Images.Domain.Images.Common;
+
 public class ArticleImageDomainModel : ImageDomainModel
 {
     public ArticleImageDomainModel(

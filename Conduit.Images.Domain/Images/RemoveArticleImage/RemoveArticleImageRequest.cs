@@ -1,5 +1,3 @@
-using Conduit.Images.Domain.Images.Common;
-
 namespace Conduit.Images.Domain.Images.RemoveArticleImage;
 
 public class RemoveArticleImageRequest

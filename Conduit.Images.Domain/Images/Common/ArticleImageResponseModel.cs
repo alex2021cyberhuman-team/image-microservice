@@ -12,4 +12,10 @@ public class ArticleImageResponseModel : ImageResponseModel
     }
 
     public Guid? ArticleId { get; }
+
+    public static implicit operator ArticleImageResponseModel(ArticleImageDomainModel image) => new(
+        image.ArticleId,
+        image.Id,
+        image.Url,
+        image.MediaType);
 }

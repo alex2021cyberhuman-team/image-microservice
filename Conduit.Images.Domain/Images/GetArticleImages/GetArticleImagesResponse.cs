@@ -5,22 +5,22 @@ namespace Conduit.Images.Domain.Images.GetArticleImages;
 
 public class GetArticleImagesResponse : BaseResponse
 {
-    public GetArticleImagesResponse(List<ArticleImageResponseModel> images,
+    public GetArticleImagesResponse(IEnumerable<ArticleImageResponseModel>? images,
         Error error,
         string? errorDescription = null) : base(error, errorDescription)
     {
-        Body = new(images);
+        Body = images != null ? new(images) : null;
     }
 
-    public ResponseBody Body { get; set; }
+    public ResponseBody? Body { get; set; }
 
     public class ResponseBody
     {
-        public ResponseBody(List<ArticleImageResponseModel> images)
+        public ResponseBody(IEnumerable<ArticleImageResponseModel> images)
         {
             Images = images;
         }
         
-        public List<ArticleImageResponseModel> Images { get; set; }
+        public IEnumerable<ArticleImageResponseModel> Images { get; set; }
     }
 }

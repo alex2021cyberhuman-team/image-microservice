@@ -7,4 +7,6 @@ public interface IImageReadRepository
     Task<ArticleImageDomainModel?> FindAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyCollection<ArticleImageDomainModel>> FindByIdsAsync(HashSet<Guid> imageIds, CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<ArticleImageDomainModel>> FindByArticleIdAsync(Guid articleId, CancellationToken cancellationToken);
 }

@@ -1,6 +1,7 @@
 using System.Net;
 using Conduit.Images.Domain.Configuration;
 using Conduit.Images.Domain.Images.AssignArticleImage;
+using Conduit.Images.Domain.Images.GetArticleImages;
 using Conduit.Images.Domain.Images.RemoveArticleImage;
 using Conduit.Images.Domain.Images.Services.Repositories;
 using Conduit.Images.Domain.Images.UploadArticleImage;
@@ -104,12 +105,23 @@ public class ImagesController : ControllerBase
         return actionResult;
     }
 
-    [HttpGet]
+    [HttpGet("article/{articleId}")]
+    [Authorize]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
-    public Task<IActionResult> GetArticleImages(Guid articleId)
+    public async Task<IActionResult> GetArticleImages(Guid articleId, 
+        [FromServices] IGetArticleImagesHandler handler,
+        CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var userId = HttpContext.GetCurrentUserId();
+        var request = new GetArticleImagesRequest(userId, articleId);
+        var response = await handler.GetAsync(request, cancellationToken);
+        var actionResult = response.Error.GetAndLogActionResult(
+            response.Body,
+            null,
+            _logger,
+            response.ErrorDescription);
+        return actionResult;
     }
 
     [HttpGet("{storageName}")]

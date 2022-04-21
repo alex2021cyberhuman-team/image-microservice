@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Conduit.Images.BusinessLogic.Images.Shared;
 using Conduit.Images.Domain.Articles;
 using Conduit.Images.Domain.Images.AssignArticleImage;
@@ -40,12 +36,12 @@ public class AssignArticleImageHandler : IAssignArticleImageHandler
     }
 
 
-    public async Task<AssignArticleImageResponse> AssignAsync(AssignArticleImageRequest assignArticleImageRequest, CancellationToken cancellationToken = default)
+    public async Task<AssignArticleImageResponse> AssignAsync(AssignArticleImageRequest request, CancellationToken cancellationToken = default)
     {
-        var articleId = assignArticleImageRequest.ArticleId;
-        var imageIds = assignArticleImageRequest.Body.ImagesToAssign;
-        var userId = assignArticleImageRequest.UserId;
-        _logger.LogInformation("Begin AsssignArticleImage {ArticleId} {UserId} {ImageIds}", articleId, userId, imageIds);
+        var articleId = request.ArticleId;
+        var imageIds = request.Body.ImagesToAssign;
+        var userId = request.UserId;
+        _logger.LogInformation("Begin AsssignArticleImage {Request}", request);
 
         var article = await _articleReadRepository.FindAsync(articleId, cancellationToken);
 
@@ -82,14 +78,14 @@ public class AssignArticleImageHandler : IAssignArticleImageHandler
     {
         if (article is null)
         {
-            _logger.LogWarning("End AsssignArticleImage article not found {ArticleId}", articleId);
+            _logger.LogWarning("End AsssignArticleImage article not found", articleId);
             var errorDescription = _stringLocalizer[LocalizationKeys.ArticleNotFound];
             return new(Error.NotFound, errorDescription);
         }
 
         if (article.AuthorId != userId)
         {
-            _logger.LogWarning("End AsssignArticleImage {UserId} user is not an author of article {ArticleId}", userId, articleId);
+            _logger.LogWarning("End AsssignArticleImage user is not an author of article", userId, articleId);
             var errorDescription = _stringLocalizer[LocalizationKeys.UserNotAuthor];
             return new(Error.Forbidden, errorDescription);
         }
@@ -108,9 +104,9 @@ public class AssignArticleImageHandler : IAssignArticleImageHandler
             return new(Error.Forbidden, errorDescription);
         }
 
-        if (images.Any(x => x.ArticleId != null))
+        if (images.Any(x => x.ArticleId != null && x.ArticleId != articleId))
         {
-            _logger.LogWarning("End AsssignArticleImage some images already assigned", userId);
+            _logger.LogWarning("End AsssignArticleImage some images already assigned to another article");
             var errorDescription = _stringLocalizer[LocalizationKeys.SomeImagesAlreadyAssigned];
             return new(Error.Forbidden, errorDescription);
         }

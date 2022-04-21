@@ -10,6 +10,7 @@ public class ConfiguredImageStorageNameGenerator : IImageStorageNameGenerator
 
     private readonly IOptionsMonitor<ImageConfiguration> _imageConfigurationsMonitor;
 
+
     public ConfiguredImageStorageNameGenerator(
         IOptionsMonitor<Options> optionsMonitor,
         IOptionsMonitor<ImageConfiguration> imageConfigurationsMonitor)
@@ -29,6 +30,19 @@ public class ConfiguredImageStorageNameGenerator : IImageStorageNameGenerator
         var storageNameFormat = OptionsInstance.StorageNameFormat;
         var storageName = string.Format(storageNameFormat, userId, imageId, extension);
         return storageName;
+    }
+
+    public bool TryGetMediaType(string storageName, out string? mediaType)
+    {
+        mediaType = string.Empty;
+        var storageNameSplit = storageName.Split('.');
+        if (storageNameSplit.Length < 2)
+        {
+            return false;
+        }
+        var extension = storageNameSplit[^1];
+        var mediaTypeMapping = ImageConfigurationsInstance.ReverseMediaTypeMapping;
+        return mediaTypeMapping.TryGetValue(extension, out mediaType);
     }
 
     public class Options

@@ -1,5 +1,3 @@
-namespace Conduit.Images.Domain.Images.Bases;
-
 public abstract class ImageResponseModel
 {
     public ImageResponseModel(

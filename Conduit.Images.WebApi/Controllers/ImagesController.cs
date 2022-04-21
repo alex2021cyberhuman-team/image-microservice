@@ -2,6 +2,7 @@ using System.Net;
 using Conduit.Images.Domain.Configuration;
 using Conduit.Images.Domain.Images.AssignArticleImage;
 using Conduit.Images.Domain.Images.RemoveArticleImage;
+using Conduit.Images.Domain.Images.Services.Repositories;
 using Conduit.Images.Domain.Images.UploadArticleImage;
 using Conduit.Images.WebApi.Services;
 using Conduit.Shared.AuthorizationExtensions;
@@ -37,7 +38,7 @@ public class ImagesController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
     public async Task<IActionResult> Upload(
-        [FromServices] IUploadArticleImageRequestHandler uploadArticleImageRequestHandler,
+        [FromServices] IUploadArticleImageRequestHandler handler,
         CancellationToken cancellationToken)
     {
         if (!CheckContentLength())
@@ -52,11 +53,11 @@ public class ImagesController : ControllerBase
 
         var userId = HttpContext.GetCurrentUserId();
         var streamProvider = new ContentBodyRequestStreamProvider(HttpContext);
-        var uploadArticleImageRequest = new UploadArticleImageRequest(
+        var request = new UploadArticleImageRequest(
             streamProvider, HttpContext.Request.ContentType!, userId
         );
-        var response = await uploadArticleImageRequestHandler.UploadAsync(uploadArticleImageRequest, cancellationToken);
-        var actionResult = response.Error.GetAndLogActionResult(response.Data, null, _logger);
+        var response = await handler.UploadAsync(request, cancellationToken);
+        var actionResult = response.Error.GetAndLogActionResult(response.Data, null, _logger, response.ErrorDescription);
         return actionResult;
     }
 
@@ -67,38 +68,65 @@ public class ImagesController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Forbidden)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public async Task<IActionResult> Remove(Guid id,
-        [FromServices] IRemoveArticleImageHandler removeArticleImageHandler,
+        [FromServices] IRemoveArticleImageHandler handler,
         CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetCurrentUserId();
-        var removeArticleImageRequest = new RemoveArticleImageRequest(userId, id);
-        var removeArticleImageResponse = await removeArticleImageHandler.RemoveAsync(removeArticleImageRequest, cancellationToken);
-        var actionResult = removeArticleImageResponse.Error.GetAndLogActionResult(
+        var request = new RemoveArticleImageRequest(userId, id);
+        var response = await handler.RemoveAsync(request, cancellationToken);
+        var actionResult = response.Error.GetAndLogActionResult(
             null,
             null,
-            _logger);
+            _logger,
+            response.ErrorDescription);
         return actionResult;
     }
 
     [Authorize]
-    [HttpPost("{imageId:guid}/assign/{articleId:guid}")]
+    [HttpPost("assign/{articleId:guid}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.Forbidden)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
-    public async Task<IActionResult> Assign(Guid imageId,
-            Guid articleId,
-            [FromServices] IAssignArticleImageHandler assignArticleImageHandler,
+    public async Task<IActionResult> Assign(Guid articleId,
+            [FromBody] AssignArticleImageRequest.RequestBody body,
+            [FromServices] IAssignArticleImageHandler handler,
             CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetCurrentUserId();
-        // var removeArticleImageRequest = new RemoveArticleImageRequest(userId, id);
-        // var removeArticleImageResponse = await removeArticleImageHandler.RemoveAsync(removeArticleImageRequest, cancellationToken);
-        // var actionResult = removeArticleImageResponse.Error.GetAndLogActionResult(
-        //     null,
-        //     null,
-        //     _logger);
+        var request = new AssignArticleImageRequest(userId, articleId, body);
+        var response = await handler.AssignAsync(request, cancellationToken);
+        var actionResult = response.Error.GetAndLogActionResult(
+            null,
+            null,
+            _logger,
+            response.ErrorDescription);
         return actionResult;
+    }
+
+    [HttpGet]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<IActionResult> GetArticleImages(Guid articleId)
+
+    [HttpGet("{storageName}")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<IActionResult> Retrieve(string storageName,
+        [FromServices] IImageStorage imageStorage,
+        [FromServices] IImageStorageNameGenerator imageStorageNameGenerator,
+        CancellationToken cancellationToken)
+    {
+        if (!imageStorageNameGenerator.TryGetMediaType(storageName, out var mediaType))
+        {
+            return NotFound();
+        }
+        var stream = await imageStorage.RetrieveAsync(storageName, cancellationToken);
+        if (stream != null)
+        {
+            return File(stream, mediaType!);
+        }
+        return NotFound();
     }
 
     private bool CheckContentType()

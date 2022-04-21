@@ -27,5 +27,19 @@ public class ImageConfiguration
         ["image/tiff"] = ".tif"
     };
 
+
+    public Dictionary<string, string> ReverseMediaTypeMapping { get; set; } = new() 
+    {
+        [".apng"] = "image/apng",
+        [".avif"] = "image/avif",
+        [".gif"] = "image/gif",
+        [".jpg"] = "image/jpeg",
+        [".png"] = "image/png",
+        [".svg"] = "image/svg+xml",
+        [".webp"] = "image/webp",
+        [".bmp"] = "image/bmp",
+        [".ico"] = "image/x-icon",
+        [".tif"] = "image/tiff"
+    };
     public TimeSpan UnassignedImagesRemovingTime { get; set; } = TimeSpan.FromMinutes(1);
 }

@@ -78,14 +78,14 @@ public class AssignArticleImageHandler : IAssignArticleImageHandler
     {
         if (article is null)
         {
-            _logger.LogWarning("End AsssignArticleImage article not found", articleId);
+            _logger.LogWarning("End AsssignArticleImage article not found");
             var errorDescription = _stringLocalizer[LocalizationKeys.ArticleNotFound];
             return new(Error.NotFound, errorDescription);
         }
 
         if (article.AuthorId != userId)
         {
-            _logger.LogWarning("End AsssignArticleImage user is not an author of article", userId, articleId);
+            _logger.LogWarning("End AsssignArticleImage user is not an author of article");
             var errorDescription = _stringLocalizer[LocalizationKeys.UserNotAuthor];
             return new(Error.Forbidden, errorDescription);
         }
@@ -99,7 +99,7 @@ public class AssignArticleImageHandler : IAssignArticleImageHandler
 
         if (images.Any(x => x.UserId != userId))
         {
-            _logger.LogWarning("End AsssignArticleImage images not uploaded by user {UserId}", userId);
+            _logger.LogWarning("End AsssignArticleImage images not uploaded by user");
             var errorDescription = _stringLocalizer[LocalizationKeys.SomeImagesNotUploadedByUser];
             return new(Error.Forbidden, errorDescription);
         }

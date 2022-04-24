@@ -55,8 +55,7 @@ public class ImagesController : ControllerBase
         var userId = HttpContext.GetCurrentUserId();
         var streamProvider = new ContentBodyRequestStreamProvider(HttpContext);
         var request = new UploadArticleImageRequest(
-            streamProvider, HttpContext.Request.ContentType!, userId
-        );
+            streamProvider, HttpContext.Request.ContentType!, userId);
         var response = await handler.UploadAsync(request, cancellationToken);
         var actionResult = response.Error.GetAndLogActionResult(response.Data, null, _logger, response.ErrorDescription);
         return actionResult;
@@ -131,16 +130,20 @@ public class ImagesController : ControllerBase
         [FromServices] IImageStorage imageStorage,
         [FromServices] IImageStorageNameGenerator imageStorageNameGenerator,
         CancellationToken cancellationToken)
-    {
+    {        
+        _logger.LogInformation("Begin RetrieveArticleImage {StorageName}", storageName);
         if (!imageStorageNameGenerator.TryGetMediaType(storageName, out var mediaType))
         {
+            _logger.LogWarning("End RetrieveArticleImage unable to determine media type");
             return NotFound();
         }
         var stream = await imageStorage.RetrieveAsync(storageName, cancellationToken);
         if (stream != null)
         {
+            _logger.LogInformation("End RetrieveArticleImage successful");
             return File(stream, mediaType!);
         }
+        _logger.LogWarning("End RetrieveArticleImage unable to find stream");
         return NotFound();
     }
 

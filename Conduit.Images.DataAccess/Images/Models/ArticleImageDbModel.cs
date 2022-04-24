@@ -5,6 +5,9 @@ namespace Conduit.Images.DataAccess.Images.Models;
 
 public class ArticleImageDbModel
 {
+    public ArticleImageDbModel()
+    {        
+    }
 
     public ArticleImageDbModel(
             Guid id,
@@ -22,17 +25,17 @@ public class ArticleImageDbModel
         ArticleId = articleId;
     }
 
-    public Guid Id { get; }
+    public Guid Id { get; set; }
 
-    public Guid UserId { get; }
+    public Guid UserId { get; set; }
 
-    public string StorageName { get; }
+    public string StorageName { get; set; } = string.Empty;
 
-    public string MediaType { get; }
+    public string MediaType { get; set; } = string.Empty;
 
-    public DateTime Uploaded { get; }
+    public DateTime Uploaded { get; set; }
 
-    public Guid? ArticleId { get; }
+    public Guid? ArticleId { get; set; }
 
     public ArticleImageDomainModel ToDomainModel(string url = "") => new(
             Id,

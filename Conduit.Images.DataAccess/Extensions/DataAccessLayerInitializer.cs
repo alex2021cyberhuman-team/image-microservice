@@ -22,7 +22,7 @@ public class DataAccessLayerInitializer
         FluentMapper.Initialize(InitializeFluentMapper);
         if (runMigrations)
         {
-            await Task.Run(_migrationRunner.MigrateUp);
+            _migrationRunner.MigrateUp();
         }
         await Task.CompletedTask;
     }

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Conduit.Images.Domain.Images.RemoveArticleImage;
 using Conduit.Images.Domain.Images.Services.Repositories;
 using Conduit.Shared.ResponsesExtensions;
@@ -30,6 +26,7 @@ public class RemoveArticleImageHandler : IRemoveArticleImageHandler
         }
 
         var canUserRemoveImage = image.UserId == request.UserId;
+        
         if (!canUserRemoveImage)
         {
             return new(Error.Forbidden);

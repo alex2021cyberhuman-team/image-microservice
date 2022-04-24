@@ -4,11 +4,11 @@ namespace Conduit.Images.DataAccess.Articles;
 
 public class ArticleDbModel
 {
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
 
-    public string Slug { get; init; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
 
-    public Guid AuthorId { get; init; }
+    public Guid AuthorId { get; set; }
 
     public class EntityMap : EntityMap<ArticleDbModel>
     {

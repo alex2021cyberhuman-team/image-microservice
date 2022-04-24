@@ -42,11 +42,12 @@ public class ConfiguredImageStorageNameGenerator : IImageStorageNameGenerator
         }
         var extension = storageNameSplit[^1];
         var mediaTypeMapping = ImageConfigurationsInstance.ReverseMediaTypeMapping;
-        return mediaTypeMapping.TryGetValue(extension, out mediaType);
+        var containsMediaType = mediaTypeMapping.TryGetValue(extension, out mediaType);
+        return containsMediaType;
     }
 
     public class Options
     {
-        public string StorageNameFormat { get; set; } = "usercontent-{0}-image-{1}.{2}";
+        public string StorageNameFormat { get; set; } = "u-{0}-i-{1}{2}";
     }
 }

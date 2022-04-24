@@ -56,7 +56,7 @@ public class ArticleConsumerRepository : IArticleConsumerRepository
         await connection.ExecuteAsync(removeArticleQuery, new
         {
             id
-        }).SingleResult();
+        });
     }
 
     public async Task UpdateAsync(UpdateArticleEventModel eventModel)
@@ -88,7 +88,7 @@ public class ArticleConsumerRepository : IArticleConsumerRepository
 
     private static async Task DeleteArticleImagesAsync(Guid articleId, NpgsqlConnection connection)
     {
-        const string deleteAssignedArticleImagesCommand = @"DELETE ""article_image""
+        const string deleteAssignedArticleImagesCommand = @"DELETE FROM ""article_image""
         WHERE ""article_id"" = @ArticleId";
         await connection.ExecuteAsync(deleteAssignedArticleImagesCommand, new { ArticleId = articleId });
     }

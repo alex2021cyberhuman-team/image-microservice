@@ -23,7 +23,7 @@ public class ImageReadRepository : IImageReadRepository
         var connection = await _connectionProvider.ProvideAsync(cancellationToken);
         const string findArticleImageQuery = @"SELECT 
             ""id"",
-            ""article_id""
+            ""article_id"",
             ""user_id"",
             ""storage_name"",
             ""media_type"",
@@ -31,7 +31,7 @@ public class ImageReadRepository : IImageReadRepository
         FROM ""article_image""
         WHERE ""id"" = @Id;";
         var dbModel = await connection.QueryFirstOrDefaultAsync<ArticleImageDbModel>(findArticleImageQuery, new { Id = id });
-        var domainModel = dbModel.ToDomainModel(_imageUrlProvider.Provide(dbModel.StorageName));
+        var domainModel = dbModel?.ToDomainModel(_imageUrlProvider.Provide(dbModel.StorageName));
         return domainModel;
     }
 
@@ -40,7 +40,7 @@ public class ImageReadRepository : IImageReadRepository
         var connection = await _connectionProvider.ProvideAsync(cancellationToken);
         const string findArticleImageByIdsQuery = @"SELECT 
             ""id"",
-            ""article_id""
+            ""article_id"",
             ""user_id"",
             ""storage_name"",
             ""media_type"",
@@ -56,7 +56,7 @@ public class ImageReadRepository : IImageReadRepository
         var connection = await _connectionProvider.ProvideAsync(cancellationToken);
         const string findArticleImagesByArticleId = @"SELECT 
             ""id"",
-            ""article_id""
+            ""article_id"",
             ""user_id"",
             ""storage_name"",
             ""media_type"",

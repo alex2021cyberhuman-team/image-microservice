@@ -4,8 +4,7 @@ namespace Conduit.Images.Domain.Images.RemoveArticleImage;
 
 public class RemoveArticleImageResponse : BaseResponse
 {
-    public RemoveArticleImageResponse(Error error)
+    public RemoveArticleImageResponse(Error error): base(error)
     {
-        Error = error;
     }
 }

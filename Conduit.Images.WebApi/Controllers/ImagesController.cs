@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
-namespace Conduit.Images.WebApi.Controllers.ImagesController;
+namespace Conduit.Images.WebApi.Controllers;
 
 [ApiController]
 [Route("images")]
@@ -33,11 +33,13 @@ public class ImagesController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    [ProducesResponseType(typeof(UploadArticleImageResponse.Model), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(UploadArticleImageResponse.Model),
+        (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
     public async Task<IActionResult> Upload(
-        [FromServices] IUploadArticleImageRequestHandler uploadArticleImageRequestHandler,
+        [FromServices]
+        IUploadArticleImageRequestHandler uploadArticleImageRequestHandler,
         CancellationToken cancellationToken)
     {
         if (!CheckContentLength())
@@ -53,10 +55,12 @@ public class ImagesController : ControllerBase
         var userId = HttpContext.GetCurrentUserId();
         var streamProvider = new ContentBodyRequestStreamProvider(HttpContext);
         var uploadArticleImageRequest = new UploadArticleImageRequest(
-            streamProvider, HttpContext.Request.ContentType!, userId
-        );
-        var response = await uploadArticleImageRequestHandler.UploadAsync(uploadArticleImageRequest, cancellationToken);
-        var actionResult = response.Error.GetAndLogActionResult(response.Data, null, _logger);
+            streamProvider, HttpContext.Request.ContentType!, userId);
+        var response =
+            await uploadArticleImageRequestHandler.UploadAsync(
+                uploadArticleImageRequest, cancellationToken);
+        var actionResult =
+            response.Error.GetAndLogActionResult(response.Data, null, _logger);
         return actionResult;
     }
 
@@ -66,17 +70,20 @@ public class ImagesController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.Forbidden)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
-    public async Task<IActionResult> Remove(Guid id,
+    public async Task<IActionResult> Remove(
+        Guid id,
         [FromServices] IRemoveArticleImageHandler removeArticleImageHandler,
         CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetCurrentUserId();
-        var removeArticleImageRequest = new RemoveArticleImageRequest(userId, id);
-        var removeArticleImageResponse = await removeArticleImageHandler.RemoveAsync(removeArticleImageRequest, cancellationToken);
-        var actionResult = removeArticleImageResponse.Error.GetAndLogActionResult(
-            null,
-            null,
-            _logger);
+        var removeArticleImageRequest =
+            new RemoveArticleImageRequest(userId, id);
+        var removeArticleImageResponse =
+            await removeArticleImageHandler.RemoveAsync(
+                removeArticleImageRequest, cancellationToken);
+        var actionResult =
+            removeArticleImageResponse.Error.GetAndLogActionResult(null, null,
+                _logger);
         return actionResult;
     }
 
@@ -86,18 +93,21 @@ public class ImagesController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.Forbidden)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
-    public async Task<IActionResult> Assign(Guid imageId,
-            Guid articleId,
-            [FromServices] IAssignArticleImageHandler assignArticleImageHandler,
-            CancellationToken cancellationToken)
+    public async Task<IActionResult> Assign(
+        Guid imageId,
+        Guid articleId,
+        [FromServices] IAssignArticleImageHandler assignArticleImageHandler,
+        CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetCurrentUserId();
-        // var removeArticleImageRequest = new RemoveArticleImageRequest(userId, id);
-        // var removeArticleImageResponse = await removeArticleImageHandler.RemoveAsync(removeArticleImageRequest, cancellationToken);
-        // var actionResult = removeArticleImageResponse.Error.GetAndLogActionResult(
-        //     null,
-        //     null,
-        //     _logger);
+        var assignArticleImageRequest = new AssignArticleImageRequest(userId,
+            articleId, new() { ImagesToAssign = new() { imageId } });
+        var assignArticleImageResponse =
+            await assignArticleImageHandler.AssignAsync(
+                assignArticleImageRequest, cancellationToken);
+        var actionResult =
+            assignArticleImageResponse.Error.GetAndLogActionResult(null, null,
+                _logger);
         return actionResult;
     }
 
@@ -113,7 +123,10 @@ public class ImagesController : ControllerBase
     {
         var contentLength = HttpContext.Request.ContentLength;
         var notEqualZero = contentLength != 0;
-        var lowerThanMaxImageSize = _imageConfiguration.MaxImageSize == long.MaxValue || HttpContext.Request.ContentLength <= _imageConfiguration.MaxImageSize;
+        var lowerThanMaxImageSize =
+            _imageConfiguration.MaxImageSize == long.MaxValue ||
+            HttpContext.Request.ContentLength <=
+            _imageConfiguration.MaxImageSize;
         var validContentLength = notEqualZero && lowerThanMaxImageSize;
         return validContentLength;
     }
@@ -122,21 +135,21 @@ public class ImagesController : ControllerBase
     {
         errors = new Dictionary<string, IEnumerable<string>>
         {
-            ["image"] = new string[] { _stringLocalizer.GetString("InvalidContentLength") }
+            ["image"] = new string[]
+            {
+                _stringLocalizer.GetString("InvalidContentLength")
+            }
         }
-    })
-    {
-        StatusCode = (int)HttpStatusCode.UnprocessableEntity
-    };
+    }) { StatusCode = (int)HttpStatusCode.UnprocessableEntity };
 
     private IActionResult InvalidContentType => new ObjectResult(new
     {
         errors = new Dictionary<string, IEnumerable<string>>
         {
-            ["image"] = new string[] { _stringLocalizer.GetString("InvalidContentType") }
+            ["image"] = new string[]
+            {
+                _stringLocalizer.GetString("InvalidContentType")
+            }
         }
-    })
-    {
-        StatusCode = (int)HttpStatusCode.UnprocessableEntity
-    };
+    }) { StatusCode = (int)HttpStatusCode.UnprocessableEntity };
 }

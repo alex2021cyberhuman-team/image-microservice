@@ -17,7 +17,7 @@ public class ConnectionProvider : IAsyncDisposable, IDisposable
         IOptions<Options> options)
     {
         _options = options.Value;
-        _connection = new Npgsql.NpgsqlConnection(_options.ImageDatabase);
+        _connection = new(_options.ImageDatabase);
         _logger = logger;
     }
 

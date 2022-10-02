@@ -39,7 +39,7 @@ public class UploadArticleImageRequestHandler : IUploadArticleImageRequestHandle
             cancellationToken);
 
         var uploadArticleImageResponse = new UploadArticleImageResponse(
-            new UploadArticleImageResponse.Model(new(
+            new(new(
                 domainModel.ArticleId,
                 domainModel.Id,
                 domainModel.Url,
